@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍎 상큼달콤 사과게임</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #fff9f0;
+      --card-bg: #ffffff;
+      --primary: #ff5e62;
+      --primary-hover: #ff4146;
+      --accent: #ff9966;
+      --text: #4a3e3d;
+      --text-muted: #8c7b79;
+      --apple-red: #ff4757;
+      --apple-leaf: #2ed573;
+      --apple-bg: #fff0f0;
+      --apple-border: #ffccd0;
+      --shadow-sm: 0 4px 12px rgba(180, 120, 100, 0.1);
+      --shadow-md: 0 8px 24px rgba(180, 120, 100, 0.16);
+      --radius-sm: 10px;
+      --radius-md: 18px;
+      --radius-lg: 26px;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Jua', 'Nunito', sans-serif;
+      background: radial-gradient(circle at top left, #fff6eb 0%, #ffedf0 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+      touch-action: none;
+    }
+
+    /* 상단 헤더 */
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      font-size: 2.2rem;
+      animation: floatApple 2.4s ease-in-out infinite;
+      display: inline-block;
+    }
+
+    @keyframes floatApple {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-6px) rotate(6deg); }
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      color: #e84146;
+      letter-spacing: 1px;
+      text-shadow: 2px 2px 0px rgba(255, 220, 220, 0.8);
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* 게임 래퍼 & 대시보드 */
+    .game-container {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 22px 26px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 3px solid #ffe3e3;
+      max-width: 960px;
+      width: 100%;
+    }
+
+    .status-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 18px;
+      padding: 12px 18px;
+      background: #fff8f6;
+      border-radius: var(--radius-md);
+      border: 2px dashed #ffd5cf;
+    }
+
+    .stat-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      padding: 8px 16px;
+      border-radius: 999px;
+      box-shadow: var(--shadow-sm);
+      border: 1.5px solid #ffe0db;
+    }
+
+    .stat-badge .icon {
+      font-size: 1.3rem;
+    }
+
+    .stat-badge .label {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .stat-badge .value {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #e84146;
+      min-width: 50px;
+      text-align: right;
+    }
+
+    .stat-badge.sum-badge .value {
+      color: #2e7d32;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      font-family: inherit;
+      font-size: 0.98rem;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      font-weight: bold;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ff6b6b, #ff4757);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #ff5252, #e83849);
+    }
+
+    .btn-secondary {
+      background: #f1f2f6;
+      color: #4b4b4b;
+    }
+
+    .btn-secondary:hover {
+      background: #e4e7eb;
+    }
+
+    .btn-accent {
+      background: linear-gradient(135deg, #ffa502, #ff7f50);
+      color: white;
+    }
+
+    /* 게임 보드 캔버스/그리드 */
+    .board-wrapper {
+      position: relative;
+      background: #fafafa;
+      border: 2px solid #ffdede;
+      border-radius: var(--radius-md);
+      padding: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    .board-grid {
+      display: grid;
+      grid-template-columns: repeat(17, 1fr);
+      grid-template-rows: repeat(10, 1fr);
+      gap: 5px;
+    }
+
+    .apple-cell {
+      width: 44px;
+      height: 44px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border: 1.5px solid #ffccd0;
+      border-radius: var(--radius-sm);
+      transition: transform 0.12s ease, border-color 0.12s, background-color 0.12s;
+      box-shadow: 0 2px 5px rgba(255, 107, 107, 0.08);
+      cursor: pointer;
+      z-index: 1;
+    }
+
+    .apple-cell .apple-shape {
+      width: 34px;
+      height: 34px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .apple-cell .apple-shape,
+    .apple-cell svg,
+    .apple-cell img.apple-img {
+      pointer-events: none;
+      -webkit-user-drag: none;
+      user-select: none;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 3px rgba(220, 50, 50, 0.25));
+    }
+
+    .apple-cell .number {
+      position: absolute;
+      top: 53%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0px 1px 2px rgba(140, 20, 20, 0.8);
+      pointer-events: none;
+    }
+
+    .apple-cell.selected {
+      background: #fff0d6;
+      border-color: #ffa502;
+      transform: scale(1.08);
+      box-shadow: 0 0 10px rgba(255, 165, 2, 0.6);
+      z-index: 2;
+    }
+
+    .apple-cell.selected.valid-ten {
+      background: #e8f5e9;
+      border-color: #2ed573;
+      box-shadow: 0 0 12px rgba(46, 213, 115, 0.8);
+    }
+
+    .apple-cell.selected svg,
+    .apple-cell.selected img.apple-img {
+      filter: drop-shadow(0 0 6px rgba(255, 165, 2, 0.8));
+    }
+
+    .apple-cell.selected.valid-ten svg,
+    .apple-cell.selected.valid-ten img.apple-img {
+      filter: drop-shadow(0 0 8px rgba(46, 213, 115, 0.9));
+    }
+
+    .apple-cell.empty {
+      background: rgba(0, 0, 0, 0.02) !important;
+      border: 1.5px dashed #f0e6e6 !important;
+      box-shadow: none !important;
+      cursor: default !important;
+      pointer-events: none !important;
+    }
+
+    .apple-cell.empty .apple-shape,
+    .apple-cell.empty img,
+    .apple-cell.empty .number {
+      display: none !important;
+      visibility: hidden !important;
+    }
+
+    /* 드래그 가이드 연결 라인 SVG */
+    .line-canvas-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .drag-line {
+      stroke: #ffa502;
+      stroke-width: 7;
+      stroke-linecap: round;
+      stroke-dasharray: 8 6;
+      animation: dash 1s linear infinite;
+      opacity: 0.85;
+    }
+
+    .drag-line.valid-ten {
+      stroke: #2ed573;
+      stroke-width: 8;
+      stroke-dasharray: none;
+      opacity: 0.95;
+    }
+
+    @keyframes dash {
+      to {
+        stroke-dashoffset: -28;
+      }
+    }
+
+    /* 일시정지 오버레이 */
+    .pause-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(4px);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      z-index: 20;
+      border-radius: var(--radius-md);
+    }
+
+    .pause-overlay.active {
+      display: flex;
+    }
+
+    .pause-title {
+      font-size: 2rem;
+      color: #e84146;
+    }
+
+    /* 팝업 모달 */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(40, 25, 25, 0.5);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      padding: 16px;
+    }
+
+    .modal-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
+      transform: translateY(16px);
+      transition: transform 0.2s ease;
+      border: 4px solid #ffccd0;
+    }
+
+    .modal-backdrop.show .modal-card {
+      transform: translateY(0);
+    }
+
+    .modal-icon {
+      font-size: 3.2rem;
+      margin-bottom: 8px;
+    }
+
+    .modal-card h2 {
+      font-size: 1.8rem;
+      color: #e84146;
+      margin-bottom: 12px;
+    }
+
+    .modal-stats {
+      background: #fff6f6;
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin: 16px 0;
+      display: flex;
+      justify-content: space-around;
+      border: 1px solid #ffd8dc;
+    }
+
+    .modal-stat-item .m-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .modal-stat-item .m-val {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #ff4757;
+    }
+
+    .input-group {
+      margin: 16px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+
+    .input-group label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-left: 4px;
+    }
+
+    .input-group input {
+      font-family: inherit;
+      padding: 11px 16px;
+      border-radius: 999px;
+      border: 2px solid #ffd5cf;
+      font-size: 1.05rem;
+      outline: none;
+      text-align: center;
+      transition: border-color 0.15s;
+    }
+
+    .input-group input:focus {
+      border-color: #ff4757;
+    }
+
+    /* 랭킹 모달 */
+    .leaderboard-list {
+      max-height: 260px;
+      overflow-y: auto;
+      margin: 16px 0;
+      padding-right: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .leaderboard-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .leaderboard-list::-webkit-scrollbar-thumb {
+      background: #ffd0d0;
+      border-radius: 10px;
+    }
+
+    .rank-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: #fff8f8;
+      border-radius: 12px;
+      border: 1px solid #ffe6e8;
+      font-size: 1rem;
+    }
+
+    .rank-row.top-1 {
+      background: #fff3d6;
+      border-color: #ffd166;
+    }
+
+    .rank-row.top-2 {
+      background: #f1f3f5;
+      border-color: #dee2e6;
+    }
+
+    .rank-row.top-3 {
+      background: #ffebe0;
+      border-color: #f7c59f;
+    }
+
+    .rank-badge {
+      width: 28px;
+      font-weight: 900;
+      text-align: center;
+      color: #8c7b79;
+    }
+
+    .top-1 .rank-badge { color: #d48806; font-size: 1.2rem; }
+    .top-2 .rank-badge { color: #595959; font-size: 1.15rem; }
+    .top-3 .rank-badge { color: #d46b08; font-size: 1.15rem; }
+
+    .rank-player {
+      flex: 1;
+      text-align: left;
+      margin: 0 12px;
+      font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rank-score {
+      font-weight: 900;
+      color: #ff4757;
+    }
+
+    .empty-rank {
+      color: var(--text-muted);
+      padding: 24px 0;
+      font-size: 0.95rem;
+    }
+
+    /* 하단 가이드 */
+    .guide-tip {
+      margin-top: 18px;
+      font-size: 0.92rem;
+      color: #9e8a88;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      padding: 8px 18px;
+      border-radius: 999px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* 반응형 화면 처리 */
+    @media (max-width: 860px) {
+      .game-container {
+        padding: 14px;
+      }
+      .board-wrapper {
+        padding: 6px;
+        max-width: 100%;
+        overflow-x: auto;
+      }
+      .apple-cell {
+        width: 32px;
+        height: 32px;
+      }
+      .apple-cell .apple-shape {
+        width: 26px;
+        height: 26px;
+      }
+      .apple-cell .number {
+        font-size: 0.95rem;
+      }
+      .stat-badge {
+        padding: 6px 12px;
+      }
+      .stat-badge .value {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <header class="header">
+    <div class="title-group">
+      <span class="logo-icon">🍎</span>
+      <h1>사과게임</h1>
+      <span class="logo-icon">🍏</span>
+    </div>
+    <p class="subtitle">시작 사과에서 <b>직선(가로·세로) 또는 대각선</b>으로 드래그해 합이 <b>10</b>이 되게 만드세요!</p>
+  </header>
+
+  <!-- 게임 메인 컨테이너 -->
+  <main class="game-container">
+    <!-- 상태 대시보드 -->
+    <div class="status-bar">
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <div class="stat-badge">
+          <span class="icon">⏱️</span>
+          <span class="label">남은 시간</span>
+          <span class="value" id="timerDisplay">120</span>
+        </div>
+
+        <div class="stat-badge">
+          <span class="icon">🍎</span>
+          <span class="label">점수</span>
+          <span class="value" id="scoreDisplay">0</span>
+        </div>
+
+        <div class="stat-badge sum-badge">
+          <span class="icon">➕</span>
+          <span class="label">선택 합계</span>
+          <span class="value" id="currentSumDisplay">0</span>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-secondary" id="pauseBtn">⏸️ 일시정지</button>
+        <button class="btn btn-accent" id="rankBtn">🏆 랭킹</button>
+        <button class="btn btn-primary" id="restartBtn">🔄 다시하기</button>
+      </div>
+    </div>
+
+    <!-- 사과 게임판 (10x17) -->
+    <div class="board-wrapper" id="boardWrapper">
+      <div class="board-grid" id="boardGrid"></div>
+
+      <!-- 드래그 라인 표시용 SVG -->
+      <svg class="line-canvas-svg" id="lineSvg">
+        <line id="dragSvgLine" class="drag-line" x1="0" y1="0" x2="0" y2="0" style="display:none;" />
+      </svg>
+
+      <!-- 일시정지 오버레이 -->
+      <div class="pause-overlay" id="pauseOverlay">
+        <div class="pause-title">⏸️ 잠시 멈춤</div>
+        <p style="color: var(--text-muted); font-size: 1.05rem;">휴식 중입니다. 언제든 다시 시작할 수 있어요!</p>
+        <button class="btn btn-primary" id="resumeBtn" style="font-size: 1.15rem; padding: 12px 28px; margin-top: 10px;">
+          ▶️ 계속하기
+        </button>
+      </div>
+    </div>
+
+    <div class="guide-tip">
+      💡 <b>Tip:</b> 사과를 누른 상태로 <b>가로, 세로, 또는 대각선</b>으로 마우스를 쭉 드래그해 보세요! 합이 10이 되면 초록색으로 빛나며 제거됩니다.
+    </div>
+  </main>
+
+  <!-- 게임 종료 모달 -->
+  <div class="modal-backdrop" id="gameOverModal">
+    <div class="modal-card">
+      <div class="modal-icon">🎉</div>
+      <h2>게임 종료!</h2>
+      <p id="gameOverMsg">수고하셨습니다! 맛있는 사과를 많이 모으셨네요!</p>
+
+      <div class="modal-stats">
+        <div class="modal-stat-item">
+          <div class="m-label">최종 획득 점수</div>
+          <div class="m-val" id="finalScore">0</div>
+        </div>
+        <div class="modal-stat-item">
+          <div class="m-label">제거한 사과 개수</div>
+          <div class="m-val" id="finalApples">0</div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="playerNameInput">명예의 전당에 올릴 닉네임:</label>
+        <input type="text" id="playerNameInput" maxlength="10" placeholder="닉네임 입력 (최대 10자)" value="새콤달콤">
+      </div>
+
+      <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px;">
+        <button class="btn btn-primary" id="saveScoreBtn">💾 랭킹 등록 & 다시 시작</button>
+        <button class="btn btn-secondary" id="modalCloseBtn">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 랭킹 모달 -->
+  <div class="modal-backdrop" id="leaderboardModal">
+    <div class="modal-card">
+      <div class="modal-icon">🏆</div>
+      <h2>명예의 전당</h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">상위 10명의 최고 점수 기록입니다.</p>
+
+      <div class="leaderboard-list" id="leaderboardList"></div>
+
+      <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px;">
+        <button class="btn btn-secondary" id="clearRankBtn" style="font-size: 0.88rem; color: #ff5252;">기록 초기화</button>
+        <button class="btn btn-primary" id="closeRankBtn">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 게임 설정 상수 ---
+    const ROWS = 10;
+    const COLS = 17;
+    const TOTAL_CELLS = ROWS * COLS;
+    const GAME_TIME = 120; // 120초
+    const STORAGE_KEY = 'apple_game_leaderboard_v1';
+
+    // 사과 이미지 소스 (imgres.htm에서 추출한 원본 이미지 URL)
+    const APPLE_IMG_SRC = "https://cdn.crowdpic.net/detail-thumb/thumb_d_ECB3D6B27CCBA59BFEBB3401A7778720.png";
+
+    // --- 상태 변수 ---
+    let board = []; // 10x17 배열: { id, row, col, val, isCleared }
+    let score = 0;
+    let applesCleared = 0;
+    let timeLeft = GAME_TIME;
+    let timerInterval = null;
+    let isPaused = false;
+    let isGameOver = false;
+
+    // 직선/대각선 드래그 상태
+    let isDragging = false;
+    let startCell = null; // { row, col }
+    let currentCell = null;
+    let selectedCells = [];
+
+    // DOM 요소 캐시
+    const boardWrapper = document.getElementById('boardWrapper');
+    const boardGrid = document.getElementById('boardGrid');
+    const dragSvgLine = document.getElementById('dragSvgLine');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const currentSumDisplay = document.getElementById('currentSumDisplay');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resumeBtn = document.getElementById('resumeBtn');
+    const pauseOverlay = document.getElementById('pauseOverlay');
+    const restartBtn = document.getElementById('restartBtn');
+    const rankBtn = document.getElementById('rankBtn');
+
+    const gameOverModal = document.getElementById('gameOverModal');
+    const finalScoreEl = document.getElementById('finalScore');
+    const finalApplesEl = document.getElementById('finalApples');
+    const playerNameInput = document.getElementById('playerNameInput');
+    const saveScoreBtn = document.getElementById('saveScoreBtn');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+    const leaderboardModal = document.getElementById('leaderboardModal');
+    const leaderboardList = document.getElementById('leaderboardList');
+    const closeRankBtn = document.getElementById('closeRankBtn');
+    const clearRankBtn = document.getElementById('clearRankBtn');
+
+    // --- 초기화 함수 ---
+    function initGame() {
+      clearInterval(timerInterval);
+      score = 0;
+      applesCleared = 0;
+      timeLeft = GAME_TIME;
+      isPaused = false;
+      isGameOver = false;
+      selectedCells = [];
+      startCell = null;
+      currentCell = null;
+
+      updateUI();
+      hideLine();
+      pauseOverlay.classList.remove('active');
+      gameOverModal.classList.remove('show');
+      leaderboardModal.classList.remove('show');
+      pauseBtn.innerHTML = '⏸️ 일시정지';
+
+      generateBoard();
+      renderBoard();
+      startTimer();
+    }
+
+    function generateBoard() {
+      board = [];
+      let idCounter = 0;
+      for (let r = 0; r < ROWS; r++) {
+        const rowArr = [];
+        for (let c = 0; c < COLS; c++) {
+          const val = Math.floor(Math.random() * 9) + 1; // 1 ~ 9
+          rowArr.push({
+            id: idCounter++,
+            row: r,
+            col: c,
+            val: val,
+            isCleared: false
+          });
+        }
+        board.push(rowArr);
+      }
+    }
+
+    function renderBoard() {
+      boardGrid.innerHTML = '';
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cellData = board[r][c];
+          const cellEl = document.createElement('div');
+          cellEl.className = 'apple-cell';
+          cellEl.dataset.row = r;
+          cellEl.dataset.col = c;
+          cellEl.dataset.id = cellData.id;
+
+          if (cellData.isCleared) {
+            cellEl.classList.add('empty');
+          } else {
+            cellEl.innerHTML = `
+              <div class="apple-shape">
+                <img src="${APPLE_IMG_SRC}" alt="apple" class="apple-img" />
+                <span class="number">${cellData.val}</span>
+              </div>
+            `;
+          }
+          boardGrid.appendChild(cellEl);
+        }
+      }
+    }
+
+    function updateCellDisplay(cellData) {
+      const el = boardGrid.querySelector(`[data-id="${cellData.id}"]`);
+      if (!el) return;
+      if (cellData.isCleared) {
+        el.className = 'apple-cell empty';
+        el.innerHTML = '';
+      }
+    }
+
+    // --- 타이머 처리 ---
+    function startTimer() {
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (!isPaused && !isGameOver) {
+          timeLeft--;
+          timerDisplay.textContent = timeLeft;
+
+          if (timeLeft <= 0) {
+            endGame();
+          }
+        }
+      }, 1000);
+    }
+
+    function togglePause() {
+      if (isGameOver) return;
+      isPaused = !isPaused;
+      if (isPaused) {
+        pauseOverlay.classList.add('active');
+        pauseBtn.innerHTML = '▶️ 계속하기';
+        clearSelection();
+      } else {
+        pauseOverlay.classList.remove('active');
+        pauseBtn.innerHTML = '⏸️ 일시정지';
+      }
+    }
+
+    function endGame() {
+      clearInterval(timerInterval);
+      isGameOver = true;
+      clearSelection();
+
+      finalScoreEl.textContent = score;
+      finalApplesEl.textContent = applesCleared;
+      gameOverModal.classList.add('show');
+    }
+
+    function updateUI() {
+      timerDisplay.textContent = timeLeft;
+      scoreDisplay.textContent = score;
+      currentSumDisplay.textContent = '0';
+    }
+
+    // --- 직선/대각선 8방향 판정 로직 ---
+    function getCellFromPoint(clientX, clientY) {
+      const elem = document.elementFromPoint(clientX, clientY);
+      if (!elem) return null;
+      const cellEl = elem.closest('.apple-cell');
+      if (!cellEl) return null;
+
+      const r = parseInt(cellEl.dataset.row);
+      const c = parseInt(cellEl.dataset.col);
+      if (isNaN(r) || isNaN(c)) return null;
+
+      return { row: r, col: c, el: cellEl, data: board[r][c] };
+    }
+
+    function getCellCenter(r, c) {
+      const el = boardGrid.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+      if (!el) return { x: 0, y: 0 };
+      const wrapperRect = boardWrapper.getBoundingClientRect();
+      const cellRect = el.getBoundingClientRect();
+      return {
+        x: (cellRect.left + cellRect.width / 2) - wrapperRect.left,
+        y: (cellRect.top + cellRect.height / 2) - wrapperRect.top
+      };
+    }
+
+    function updateLinePosition(startPoint, endPoint, isValidTen) {
+      dragSvgLine.setAttribute('x1', startPoint.x);
+      dragSvgLine.setAttribute('y1', startPoint.y);
+      dragSvgLine.setAttribute('x2', endPoint.x);
+      dragSvgLine.setAttribute('y2', endPoint.y);
+      dragSvgLine.style.display = 'block';
+
+      if (isValidTen) {
+        dragSvgLine.classList.add('valid-ten');
+      } else {
+        dragSvgLine.classList.remove('valid-ten');
+      }
+    }
+
+    function hideLine() {
+      dragSvgLine.style.display = 'none';
+      dragSvgLine.classList.remove('valid-ten');
+    }
+
+    // 두 좌표 (r1, c1)과 (r2, c2) 사이를 8방향 직선으로 투영하여 중간 셀 리스트 추출
+    function computeStraightLineCells(r1, c1, r2, c2) {
+      const dr = r2 - r1;
+      const dc = c2 - c1;
+
+      // 같은 위치인 경우
+      if (dr === 0 && dc === 0) {
+        return [{ row: r1, col: c1 }];
+      }
+
+      const absDr = Math.abs(dr);
+      const absDc = Math.abs(dc);
+
+      let stepR = 0;
+      let stepC = 0;
+      let steps = 0;
+
+      // 8방향 (가로 / 세로 / 대각선) 각도 판정
+      if (absDr === 0) {
+        // 완전 가로
+        stepR = 0;
+        stepC = Math.sign(dc);
+        steps = absDc;
+      } else if (absDc === 0) {
+        // 완전 세로
+        stepR = Math.sign(dr);
+        stepC = 0;
+        steps = absDr;
+      } else if (absDr === absDc) {
+        // 정확한 대각선
+        stepR = Math.sign(dr);
+        stepC = Math.sign(dc);
+        steps = absDr;
+      } else {
+        // 정확히 맞지 않을 경우 가장 가까운 8방향 벡터로 스냅
+        if (absDr > 2 * absDc) {
+          // 세로에 가까움
+          stepR = Math.sign(dr);
+          stepC = 0;
+          steps = absDr;
+        } else if (absDc > 2 * absDr) {
+          // 가로에 가까움
+          stepR = 0;
+          stepC = Math.sign(dc);
+          steps = absDc;
+        } else {
+          // 대각선에 가까움 (정사각형 대각선 비율로 스냅)
+          stepR = Math.sign(dr);
+          stepC = Math.sign(dc);
+          steps = Math.min(absDr, absDc);
+        }
+      }
+
+      const lineCells = [];
+      for (let i = 0; i <= steps; i++) {
+        const nr = r1 + stepR * i;
+        const nc = c1 + stepC * i;
+        if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
+          lineCells.push({ row: nr, col: nc });
+        }
+      }
+      return lineCells;
+    }
+
+    function onDragStart(e) {
+      if (isPaused || isGameOver) return;
+      if (e.type === 'mousedown' && e.button !== 0) return;
+
+      const pageX = e.touches ? e.touches[0].clientX : e.clientX;
+      const pageY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      const cellInfo = getCellFromPoint(pageX, pageY);
+      if (!cellInfo || cellInfo.data.isCleared) return;
+
+      isDragging = true;
+      startCell = { row: cellInfo.row, col: cellInfo.col };
+      currentCell = { ...startCell };
+
+      highlightLineCells([startCell]);
+    }
+
+    function onDragMove(e) {
+      if (!isDragging || isPaused || isGameOver || !startCell) return;
+
+      const pageX = e.touches ? e.touches[0].clientX : e.clientX;
+      const pageY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      const cellInfo = getCellFromPoint(pageX, pageY);
+      const targetR = cellInfo ? cellInfo.row : startCell.row;
+      const targetC = cellInfo ? cellInfo.col : startCell.col;
+
+      currentCell = { row: targetR, col: targetC };
+
+      const pathCoords = computeStraightLineCells(startCell.row, startCell.col, targetR, targetC);
+      highlightLineCells(pathCoords);
+    }
+
+    function onDragEnd() {
+      if (!isDragging) return;
+      isDragging = false;
+      hideLine();
+
+      checkSumAndClear();
+    }
+
+    function highlightLineCells(coords) {
+      // 기존 선택 해제
+      boardGrid.querySelectorAll('.apple-cell.selected').forEach(el => {
+        el.classList.remove('selected', 'valid-ten');
+      });
+
+      selectedCells = [];
+      let sum = 0;
+
+      coords.forEach(pos => {
+        const cellData = board[pos.row][pos.col];
+        // 제거되지 않은 사과만 카운트 및 하이라이트
+        if (!cellData.isCleared) {
+          selectedCells.push(cellData);
+          sum += cellData.val;
+
+          const el = boardGrid.querySelector(`[data-row="${pos.row}"][data-col="${pos.col}"]`);
+          if (el) el.classList.add('selected');
+        }
+      });
+
+      const isValidTen = (sum === 10 && selectedCells.length > 0);
+
+      if (isValidTen) {
+        selectedCells.forEach(cell => {
+          const el = boardGrid.querySelector(`[data-row="${cell.row}"][data-col="${cell.col}"]`);
+          if (el) el.classList.add('valid-ten');
+        });
+      }
+
+      // 시작/끝 사과 중심 좌표를 이어주는 라인 그리기
+      if (coords.length > 0) {
+        const startPos = getCellCenter(startCell.row, startCell.col);
+        const lastPos = coords[coords.length - 1];
+        const endPos = getCellCenter(lastPos.row, lastPos.col);
+        updateLinePosition(startPos, endPos, isValidTen);
+      }
+
+      currentSumDisplay.textContent = sum;
+      if (sum === 10) {
+        currentSumDisplay.style.color = '#2e7d32'; // 녹색
+      } else if (sum > 10) {
+        currentSumDisplay.style.color = '#d63031'; // 초과 빨강
+      } else {
+        currentSumDisplay.style.color = '#e84146';
+      }
+    }
+
+    function checkSumAndClear() {
+      const sum = selectedCells.reduce((acc, cur) => acc + cur.val, 0);
+
+      if (sum === 10 && selectedCells.length > 0) {
+        const clearedCount = selectedCells.length;
+        selectedCells.forEach(cell => {
+          cell.isCleared = true;
+          updateCellDisplay(cell);
+        });
+
+        applesCleared += clearedCount;
+        score += clearedCount * 10;
+        scoreDisplay.textContent = score;
+
+        // 효과적인 피드백 (화면 점수 깜빡임 효과 등)
+        scoreDisplay.style.transform = 'scale(1.2)';
+        setTimeout(() => { scoreDisplay.style.transform = 'scale(1)'; }, 200);
+
+        const remaining = board.flat().filter(c => !c.isCleared).length;
+        if (remaining === 0) {
+          score += 500;
+          scoreDisplay.textContent = score;
+          endGame();
+          return;
+        }
+      }
+
+      // 사과 제거 DOM 갱신 후 선택 해제
+      clearSelection();
+    }
+
+    function clearSelection() {
+      selectedCells = [];
+      startCell = null;
+      currentCell = null;
+      hideLine();
+      boardGrid.querySelectorAll('.apple-cell.selected').forEach(el => {
+        el.classList.remove('selected', 'valid-ten');
+      });
+      currentSumDisplay.textContent = '0';
+      currentSumDisplay.style.color = '#2e7d32';
+    }
+
+    // --- 랭킹 및 LocalStorage 관리 ---
+    function getLeaderboard() {
+      try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveScore(name, finalScore) {
+      const list = getLeaderboard();
+      list.push({
+        name: name || '달콤한사과',
+        score: finalScore,
+        date: new Date().toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+      });
+
+      list.sort((a, b) => b.score - a.score);
+      const top10 = list.slice(0, 10);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(top10));
+    }
+
+    function displayLeaderboard() {
+      const list = getLeaderboard();
+      leaderboardList.innerHTML = '';
+
+      if (list.length === 0) {
+        leaderboardList.innerHTML = `<div class="empty-rank">아직 등록된 랭킹 기록이 없습니다.<br>첫 번째 챔피언이 되어보세요! 🍎</div>`;
+        return;
+      }
+
+      list.forEach((entry, idx) => {
+        const row = document.createElement('div');
+        let topClass = '';
+        let rankSymbol = (idx + 1);
+
+        if (idx === 0) {
+          topClass = 'top-1';
+          rankSymbol = '🥇';
+        } else if (idx === 1) {
+          topClass = 'top-2';
+          rankSymbol = '🥈';
+        } else if (idx === 2) {
+          topClass = 'top-3';
+          rankSymbol = '🥉';
+        }
+
+        row.className = `rank-row ${topClass}`;
+        row.innerHTML = `
+          <div class="rank-badge">${rankSymbol}</div>
+          <div class="rank-player">${escapeHtml(entry.name)} <span style="font-size:0.75rem; color:#a09090; font-weight:normal;">(${entry.date || ''})</span></div>
+          <div class="rank-score">${entry.score}점</div>
+        `;
+        leaderboardList.appendChild(row);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+
+    // --- 이벤트 바인딩 ---
+    function bindEvents() {
+      // 마우스 드래그 이벤트
+      boardWrapper.addEventListener('mousedown', onDragStart);
+      window.addEventListener('mousemove', onDragMove);
+      window.addEventListener('mouseup', onDragEnd);
+
+      // 브라우저 기본 이미지 드래그 방지
+      boardWrapper.addEventListener('dragstart', (e) => e.preventDefault());
+
+      // 모바일/터치 이벤트
+      boardWrapper.addEventListener('touchstart', onDragStart, { passive: false });
+      window.addEventListener('touchmove', onDragMove, { passive: false });
+      window.addEventListener('touchend', onDragEnd);
+
+      // 컨트롤 버튼
+      pauseBtn.addEventListener('click', togglePause);
+      resumeBtn.addEventListener('click', togglePause);
+      restartBtn.addEventListener('click', initGame);
+
+      // 랭킹 모달
+      rankBtn.addEventListener('click', () => {
+        displayLeaderboard();
+        leaderboardModal.classList.add('show');
+      });
+
+      closeRankBtn.addEventListener('click', () => {
+        leaderboardModal.classList.remove('show');
+      });
+
+      clearRankBtn.addEventListener('click', () => {
+        if (confirm('저장된 모든 랭킹 기록을 삭제하시겠습니까?')) {
+          localStorage.removeItem(STORAGE_KEY);
+          displayLeaderboard();
+        }
+      });
+
+      saveScoreBtn.addEventListener('click', () => {
+        const name = playerNameInput.value.trim() || '익명의달인';
+        saveScore(name, score);
+        gameOverModal.classList.remove('show');
+        displayLeaderboard();
+        leaderboardModal.classList.add('show');
+      });
+
+      modalCloseBtn.addEventListener('click', () => {
+        gameOverModal.classList.remove('show');
+        initGame();
+      });
+
+      leaderboardModal.addEventListener('click', (e) => {
+        if (e.target === leaderboardModal) leaderboardModal.classList.remove('show');
+      });
+      gameOverModal.addEventListener('click', (e) => {
+        if (e.target === gameOverModal) gameOverModal.classList.remove('show');
+      });
+    }
+
+    // 시작
+    window.addEventListener('DOMContentLoaded', () => {
+      bindEvents();
+      initGame();
+    });
+  </script>
+</body>
+</html>
